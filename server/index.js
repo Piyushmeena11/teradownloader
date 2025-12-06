@@ -393,7 +393,6 @@ app.get('/api/stream/:shareId', async (req, res) => {
       
       // Handle stream end
       fileResponse.data.on('end', () => {
-        console.log('Stream completed successfully for:', finalFileName);
         if (!res.headersSent) {
           res.end();
         }

@@ -1,41 +1,21 @@
-# TeraDownloader - Deployment Guide
+# 🚀 TeraDownloader - Deployment Guide
 
-## ✅ All Issues Fixed
+Complete guide for deploying TeraDownloader to production.
 
-### 1. **Syntax Error Fixed**
-- Fixed missing dependency array in `useCallback` for `handleBatchDownload`
-- All React hooks properly configured
+## 📋 Prerequisites
 
-### 2. **Performance Optimizations**
-- ✅ Code splitting with React.lazy()
-- ✅ Lazy loading for all pages
-- ✅ Optimized animations (reduced frequency)
-- ✅ Image lazy loading
-- ✅ Reduced update intervals (500ms → 1000ms)
-- ✅ Build optimizations (Terser minification, chunk splitting)
-- ✅ Compression middleware enabled
-- ✅ Resource hints (preconnect, dns-prefetch)
+- Node.js 18+ installed
+- npm or yarn package manager
+- Production server (VPS, Cloud, etc.)
+- Domain name (optional but recommended)
+- SSL certificate (recommended for HTTPS)
 
-### 3. **Security Enhancements**
-- ✅ Helmet.js for security headers
-- ✅ CORS properly configured (restrictive in production)
-- ✅ Input sanitization (URL and shareId)
-- ✅ URL length limits (2048 chars)
-- ✅ ShareId validation (alphanumeric, hyphens, underscores only)
-- ✅ Body size limits (10MB)
-- ✅ Error handling middleware
-- ✅ 404 handler
-- ✅ Content Security Policy (CSP)
-- ✅ Rate limiting (already implemented)
+---
 
-## 🚀 Deployment Steps
-
-### Prerequisites
-1. Node.js 18+ installed
-2. npm or yarn package manager
-3. Production server (VPS, Cloud, etc.)
+## 🏗️ Build Process
 
 ### Step 1: Build the Client
+
 ```bash
 cd client
 npm install
@@ -44,13 +24,19 @@ npm run build
 
 This creates an optimized production build in `client/dist/`
 
-### Step 2: Prepare Server
+### Step 2: Install Server Dependencies
+
 ```bash
 cd server
-npm install
+npm install --production
 ```
 
-### Step 3: Environment Variables
+---
+
+## ⚙️ Configuration
+
+### Environment Variables
+
 Create a `.env` file in the `server` directory:
 
 ```env
@@ -59,21 +45,14 @@ NODE_ENV=production
 ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 ```
 
-### Step 4: Start Server
-```bash
-cd server
-npm start
-```
+**Important:** Replace `yourdomain.com` with your actual domain.
 
-Or use PM2 for process management:
-```bash
-npm install -g pm2
-pm2 start server/index.js --name teradownloader-api
-pm2 save
-pm2 startup
-```
+---
 
-### Step 5: Serve Client (Option 1 - Express Static)
+## 🚀 Deployment Options
+
+### Option 1: Express Static (Simple)
+
 Update `server/index.js` to serve static files:
 
 ```javascript
@@ -92,7 +71,14 @@ app.get('*', (req, res) => {
 });
 ```
 
-### Step 6: Serve Client (Option 2 - Nginx)
+Then start the server:
+```bash
+cd server
+npm start
+```
+
+### Option 2: Nginx Reverse Proxy (Recommended)
+
 Configure Nginx as reverse proxy:
 
 ```nginx
@@ -121,84 +107,125 @@ server {
 }
 ```
 
-### Step 7: SSL/HTTPS (Recommended)
-Use Let's Encrypt with Certbot:
+---
+
+## 🔒 SSL/HTTPS Setup
+
+### Using Let's Encrypt (Free)
+
 ```bash
+# Install Certbot
+sudo apt-get update
 sudo apt-get install certbot python3-certbot-nginx
-sudo certbot --nginx -d yourdomain.com
+
+# Get SSL certificate
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+
+# Auto-renewal (already configured)
+sudo certbot renew --dry-run
 ```
 
-## 📊 Performance Checklist
+---
 
-- ✅ Code splitting implemented
-- ✅ Lazy loading enabled
-- ✅ Compression enabled
-- ✅ Images optimized (lazy loading)
-- ✅ Animations optimized
-- ✅ Bundle size minimized
-- ✅ Caching implemented
-- ✅ Rate limiting active
+## 📦 Process Management
 
-## 🔒 Security Checklist
+### Using PM2 (Recommended)
 
-- ✅ Helmet.js security headers
-- ✅ CORS configured
-- ✅ Input sanitization
-- ✅ URL validation
-- ✅ Rate limiting
-- ✅ Error handling
-- ✅ CSP headers
-- ✅ Body size limits
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start the application
+cd server
+pm2 start index.js --name teradownloader-api
+
+# Save PM2 configuration
+pm2 save
+
+# Setup PM2 to start on system boot
+pm2 startup
+```
+
+### PM2 Commands
+
+```bash
+# View logs
+pm2 logs teradownloader-api
+
+# Restart application
+pm2 restart teradownloader-api
+
+# Stop application
+pm2 stop teradownloader-api
+
+# Monitor
+pm2 monit
+```
+
+---
+
+## ✅ Production Checklist
+
+- [ ] Environment variables configured
+- [ ] Client built (`npm run build`)
+- [ ] Server dependencies installed
+- [ ] SSL certificate configured (if using HTTPS)
+- [ ] Domain DNS configured
+- [ ] CORS origins updated in `.env`
+- [ ] Rate limiting tested
+- [ ] Error logging configured
+- [ ] Process manager (PM2) set up
+- [ ] Monitoring set up (optional)
+- [ ] Backup strategy in place
+- [ ] Firewall configured
+
+---
 
 ## 🧪 Testing
 
-1. **Test API endpoints:**
-   ```bash
-   curl http://localhost:3002/api/health
-   ```
+### 1. Test API Endpoints
 
-2. **Test client build:**
-   ```bash
-   cd client
-   npm run preview
-   ```
+```bash
+curl http://localhost:3002/api/health
+```
 
-3. **Run Lighthouse audit:**
-   - Open Chrome DevTools
-   - Go to Lighthouse tab
-   - Run audit
-   - Expected scores:
-     - Performance: 70-90+
-     - Accessibility: 95+
-     - Best Practices: 95+
-     - SEO: 100
+### 2. Test Client Build
 
-## 📝 Production Checklist
+```bash
+cd client
+npm run preview
+```
 
-- [ ] Environment variables set
-- [ ] Client built (`npm run build`)
-- [ ] Server dependencies installed
-- [ ] SSL certificate configured
-- [ ] Domain DNS configured
-- [ ] CORS origins updated
-- [ ] Rate limiting tested
-- [ ] Error logging configured
-- [ ] Monitoring set up (optional)
-- [ ] Backup strategy in place
+### 3. Run Lighthouse Audit
+
+- Open Chrome DevTools
+- Go to Lighthouse tab
+- Run audit
+- Expected scores:
+  - Performance: 70-90+
+  - Accessibility: 95+
+  - Best Practices: 95+
+  - SEO: 100
+
+---
 
 ## 🐛 Troubleshooting
 
 ### Port Already in Use
+
+**Windows:**
 ```bash
-# Windows
 netstat -ano | findstr :3002
 taskkill /PID <PID> /F
+```
 
-# Linux/Mac
+**Linux/Mac:**
+```bash
 lsof -ti:3002 | xargs kill -9
 ```
 
 ### Build Errors
+
 ```bash
 # Clear cache and rebuild
 cd client
@@ -208,19 +235,86 @@ npm run build
 ```
 
 ### CORS Issues
+
 - Check `ALLOWED_ORIGINS` in `.env`
 - Ensure frontend URL matches exactly
 - Check browser console for CORS errors
+- Verify HTTPS/HTTP protocol matches
+
+### Server Not Starting
+
+- Check Node.js version: `node --version` (should be 18+)
+- Verify all dependencies installed: `npm install`
+- Check server logs: `pm2 logs teradownloader-api`
+- Verify port is not in use
+
+---
+
+## 📊 Monitoring
+
+### PM2 Monitoring
+
+```bash
+# Real-time monitoring
+pm2 monit
+
+# View logs
+pm2 logs teradownloader-api --lines 100
+
+# View process info
+pm2 show teradownloader-api
+```
+
+### System Resources
+
+```bash
+# CPU and Memory usage
+top
+htop  # if installed
+
+# Disk usage
+df -h
+
+# Network connections
+netstat -tulpn
+```
+
+---
+
+## 🔄 Updates & Maintenance
+
+### Updating the Application
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# Rebuild client
+cd client
+npm install
+npm run build
+
+# Restart server
+pm2 restart teradownloader-api
+```
+
+### Backup Strategy
+
+1. **Code Backup**: Use Git (already configured)
+2. **Database Backup**: N/A (stateless application)
+3. **Configuration Backup**: Backup `.env` file securely
+4. **Logs Backup**: Archive PM2 logs periodically
+
+---
 
 ## 📞 Support
 
-For issues or questions, check:
-- Server logs: `pm2 logs teradownloader-api`
-- Browser console for client errors
-- Network tab for API errors
+For deployment issues:
+- Check server logs: `pm2 logs teradownloader-api`
+- Check browser console for client errors
+- Check network tab for API errors
+- Review this guide for common issues
 
 ---
 
 **Ready for Production! 🚀**
-
-
