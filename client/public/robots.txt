@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://teradownloader.com/sitemap.xml
+
+# Disallow admin and API endpoints
+Disallow: /api/
+
+# Allow all blog posts
+Allow: /blog/
+Allow: /blog/*
+
+# Allow all pages
+Allow: /
+Allow: /features
+Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+
+
