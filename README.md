@@ -168,4 +168,4 @@ For issues or questions, please open an issue on GitHub.
 
 ---
 
-**Made with ❤️ for fast downloads**
+**Build by Hamza for fast downloads**
