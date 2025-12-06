@@ -339,7 +339,7 @@ This project is free to use and modify. No license restrictions.
 
 <div align="center">
 
-**Made with ❤️ for fast downloads**
+**Made with ❤️ by Hamza for fast downloads**
 
 ⭐ Star this repo if you find it helpful!
 
