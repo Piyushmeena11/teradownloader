@@ -9,6 +9,7 @@ import compression from 'compression';
 import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
 
 dotenv.config();
 
@@ -552,19 +553,53 @@ app.use((err, req, res, next) => {
 
 // Serve static files from React app (for production)
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
+  // Try multiple possible paths for the dist folder
+  const possiblePaths = [
+    path.join(__dirname, '../client/dist'),
+    path.join(process.cwd(), 'client/dist'),
+    path.join(process.cwd(), '../client/dist')
+  ];
   
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    // Don't serve React app for API routes
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({
-        success: false,
-        error: 'Endpoint not found'
-      });
+  let distPath = null;
+  for (const possiblePath of possiblePaths) {
+    if (existsSync(possiblePath) && existsSync(path.join(possiblePath, 'index.html'))) {
+      distPath = possiblePath;
+      console.log(`✅ Found React build at: ${distPath}`);
+      break;
     }
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-  });
+  }
+  
+  if (distPath) {
+    app.use(express.static(distPath));
+    
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      // Don't serve React app for API routes
+      if (req.path.startsWith('/api')) {
+        return res.status(404).json({
+          success: false,
+          error: 'Endpoint not found'
+        });
+      }
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  } else {
+    console.warn('⚠️  React build not found. Serving API only.');
+    console.warn('   Searched paths:', possiblePaths);
+    // 404 handler if build not found
+    app.use((req, res) => {
+      if (req.path.startsWith('/api')) {
+        return res.status(404).json({
+          success: false,
+          error: 'Endpoint not found'
+        });
+      }
+      res.status(404).json({
+        success: false,
+        error: 'Frontend build not found. Please ensure the client was built successfully.'
+      });
+    });
+  }
 } else {
   // 404 handler for development (API only)
   app.use((req, res) => {
