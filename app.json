@@ -1,0 +1,42 @@
+{
+    "name": "TeraBox Downloader Bot",
+    "description": "A Telegram bot that downloads videos from TeraBox and uploads them to a specific channel.",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/1024px-Telegram_logo.svg.png",
+    "keywords": [
+        "telegram",
+        "bot",
+        "python",
+        "terabox",
+        "uploader"
+    ],
+    "repository": "https://github.com/hamzamuzamil/teradownloader",
+    "env": {
+        "API_ID": {
+            "description": "Get this from https://my.telegram.org",
+            "required": true
+        },
+        "API_HASH": {
+            "description": "Get this from https://my.telegram.org",
+            "required": true
+        },
+        "BOT_TOKEN": {
+            "description": "Get this from @BotFather on Telegram",
+            "required": true
+        },
+        "TARGET_CHANNEL": {
+            "description": "The Username (e.g., @mychannel) or ID of the channel where videos will be uploaded.",
+            "required": true
+        }
+    },
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ],
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "basic"
+        }
+    }
+}
