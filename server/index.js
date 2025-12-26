@@ -603,17 +603,25 @@ if (process.env.NODE_ENV === 'production') {
   } else {
     console.error('❌ React build not found. Serving API only.');
     console.error('   All searched paths:', possiblePaths.map(p => path.resolve(p)));
-    // 404 handler if build not found
-    app.use((req, res) => {
+    
+    // Serve a nice error page for non-API routes
+    app.get('*', (req, res) => {
       if (req.path.startsWith('/api')) {
         return res.status(404).json({
           success: false,
           error: 'Endpoint not found'
         });
       }
-      res.status(404).json({
-        success: false,
-        error: 'Frontend build not found. Please ensure the client was built successfully.'
+      // Serve the error HTML page
+      res.status(503).sendFile(path.join(__dirname, 'error.html'), (err) => {
+        if (err) {
+          // Fallback to JSON if HTML file not found
+          res.status(503).json({
+            success: false,
+            error: 'Frontend build not found. Please ensure the client was built successfully.',
+            message: 'The React application build files are missing. Please check the build logs.'
+          });
+        }
       });
     });
   }
