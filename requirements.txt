@@ -1,0 +1,4 @@
+pyrogram
+tgcrypto
+requests
+# Add your specific terabox library here if available on pip
