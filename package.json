@@ -1,19 +1,26 @@
 {
-  "name": "teradownloader-server",
+  "name": "teradownloader",
   "version": "1.0.0",
+  "description": "Premium Terabox Downloader Web Tool",
   "type": "module",
   "scripts": {
-    "dev": "node --watch index.js",
-    "start": "node index.js"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && NPM_CONFIG_PRODUCTION=false npm install",
+    "heroku-postbuild": "npm run install:all && npm run build && (test -d client/dist && echo '✅ Build successful: dist folder exists' || (echo '❌ Build failed: dist folder not found' && exit 1))"
   },
-  "dependencies": {
-    "axios": "^1.6.2",
-    "cheerio": "^1.0.0-rc.12",
-    "compression": "^1.8.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "form-data": "^4.0.0",
-    "helmet": "^8.1.0"
+  "keywords": ["terabox", "downloader", "file-downloader"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
   }
 }
+
