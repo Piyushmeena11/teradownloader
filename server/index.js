@@ -7,6 +7,11 @@ import { rateLimiter } from './middleware/rateLimiter.js';
 import { serverCache } from './services/cacheService.js';
 import compression from 'compression';
 import axios from 'axios';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -545,13 +550,30 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found'
+// Serve static files from React app (for production)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+  
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    // Don't serve React app for API routes
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({
+        success: false,
+        error: 'Endpoint not found'
+      });
+    }
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
   });
-});
+} else {
+  // 404 handler for development (API only)
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      error: 'Endpoint not found'
+    });
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`🚀 TeraDownloader API server running on port ${PORT}`);
