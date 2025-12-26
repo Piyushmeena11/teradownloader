@@ -553,19 +553,36 @@ app.use((err, req, res, next) => {
 
 // Serve static files from React app (for production)
 if (process.env.NODE_ENV === 'production') {
-  // Try multiple possible paths for the dist folder
+  // Calculate paths - __dirname is /app/server, so ../client/dist should be /app/client/dist
+  // Also try absolute path from app root (Heroku uses /app as root)
+  const appRoot = path.resolve(__dirname, '..');
   const possiblePaths = [
-    path.join(__dirname, '../client/dist'),
-    path.join(process.cwd(), 'client/dist'),
-    path.join(process.cwd(), '../client/dist')
+    path.join(__dirname, '../client/dist'),  // Relative from server dir: /app/server/../client/dist
+    path.join(appRoot, 'client/dist'),      // From app root: /app/client/dist
+    '/app/client/dist',                      // Absolute path on Heroku
+    path.join(process.cwd(), '../client/dist') // If cwd is server: ../client/dist
   ];
+  
+  console.log('🔍 Looking for React build...');
+  console.log('   __dirname:', __dirname);
+  console.log('   process.cwd():', process.cwd());
+  console.log('   appRoot:', appRoot);
   
   let distPath = null;
   for (const possiblePath of possiblePaths) {
-    if (existsSync(possiblePath) && existsSync(path.join(possiblePath, 'index.html'))) {
-      distPath = possiblePath;
-      console.log(`✅ Found React build at: ${distPath}`);
-      break;
+    const normalizedPath = path.resolve(possiblePath);
+    console.log(`   Checking: ${normalizedPath}`);
+    if (existsSync(normalizedPath)) {
+      const indexPath = path.join(normalizedPath, 'index.html');
+      if (existsSync(indexPath)) {
+        distPath = normalizedPath;
+        console.log(`✅ Found React build at: ${distPath}`);
+        break;
+      } else {
+        console.log(`   ⚠️  Directory exists but index.html not found`);
+      }
+    } else {
+      console.log(`   ❌ Path does not exist`);
     }
   }
   
@@ -584,8 +601,8 @@ if (process.env.NODE_ENV === 'production') {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   } else {
-    console.warn('⚠️  React build not found. Serving API only.');
-    console.warn('   Searched paths:', possiblePaths);
+    console.error('❌ React build not found. Serving API only.');
+    console.error('   All searched paths:', possiblePaths.map(p => path.resolve(p)));
     // 404 handler if build not found
     app.use((req, res) => {
       if (req.path.startsWith('/api')) {
