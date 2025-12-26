@@ -1,42 +1,30 @@
 {
-    "name": "TeraBox Downloader Bot",
-    "description": "A Telegram bot that downloads videos from TeraBox and uploads them to a specific channel.",
-    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/1024px-Telegram_logo.svg.png",
-    "keywords": [
-        "telegram",
-        "bot",
-        "python",
-        "terabox",
-        "uploader"
-    ],
-    "repository": "https://github.com/hamzamuzamil/teradownloader",
-    "env": {
-        "API_ID": {
-            "description": "Get this from https://my.telegram.org",
-            "required": true
-        },
-        "API_HASH": {
-            "description": "Get this from https://my.telegram.org",
-            "required": true
-        },
-        "BOT_TOKEN": {
-            "description": "Get this from @BotFather on Telegram",
-            "required": true
-        },
-        "TARGET_CHANNEL": {
-            "description": "The Username (e.g., @mychannel) or ID of the channel where videos will be uploaded.",
-            "required": true
-        }
-    },
-    "buildpacks": [
-        {
-            "url": "heroku/python"
-        }
-    ],
-    "formation": {
-        "worker": {
-            "quantity": 1,
-            "size": "basic"
-        }
+  "name": "TeraDownloader",
+  "description": "Premium Terabox Downloader Web Tool - Download files from Terabox without registration",
+  "repository": "https://github.com/yourusername/teradownloader",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["terabox", "downloader", "node", "express", "react", "vite"],
+  "success_url": "/",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
     }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production",
+      "required": false
+    },
+    "ALLOWED_ORIGINS": {
+      "description": "Comma-separated list of allowed CORS origins (will be set automatically after deployment)",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  }
 }
