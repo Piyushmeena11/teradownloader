@@ -1,3 +1,5 @@
+console.log('🚀 Starting server initialization...');
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -11,7 +13,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'fs';
 
+console.log('✅ All imports loaded successfully');
+console.log('📦 Loading environment variables...');
 dotenv.config();
+console.log('✅ Environment loaded');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -613,16 +618,17 @@ if (process.env.NODE_ENV === 'production') {
         });
       }
       // Serve the error HTML page
-      res.status(503).sendFile(path.join(__dirname, 'error.html'), (err) => {
-        if (err) {
-          // Fallback to JSON if HTML file not found
-          res.status(503).json({
-            success: false,
-            error: 'Frontend build not found. Please ensure the client was built successfully.',
-            message: 'The React application build files are missing. Please check the build logs.'
-          });
-        }
-      });
+      const errorHtmlPath = path.join(__dirname, 'error.html');
+      if (existsSync(errorHtmlPath)) {
+        res.status(503).sendFile(errorHtmlPath);
+      } else {
+        // Fallback to JSON if HTML file not found
+        res.status(503).json({
+          success: false,
+          error: 'Frontend build not found. Please ensure the client was built successfully.',
+          message: 'The React application build files are missing. Please check the build logs.'
+        });
+      }
     });
   }
 } else {
@@ -635,7 +641,24 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`🚀 TeraDownloader API server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+// Start server with error handling
+try {
+  app.listen(PORT, () => {
+    console.log(`🚀 TeraDownloader API server running on port ${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+} catch (error) {
+  console.error('❌ Failed to start server:', error);
+  process.exit(1);
+}
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
